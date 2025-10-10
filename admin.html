@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="da">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Admin – Vagtplan</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-900 text-white font-sans p-6">
+    <div id="app" class="max-w-5xl mx-auto space-y-8">
+      <h1 class="text-2xl font-bold text-center mb-6">
+        🛠️ Adminpanel – Vagtplan
+      </h1>
+
+      <!-- Helligdage -->
+      <section class="bg-gray-800 p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold mb-4">📅 Helligdage</h2>
+        <div class="flex gap-3 mb-4">
+          <input
+            v-model="newHoliday.date"
+            type="date"
+            class="p-2 rounded bg-gray-700 border border-gray-600 text-white"
+          />
+          <input
+            v-model="newHoliday.description"
+            placeholder="Beskrivelse"
+            class="p-2 rounded bg-gray-700 border border-gray-600 text-white flex-1"
+          />
+          <button
+            @click="addHoliday"
+            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
+          >
+            Tilføj
+          </button>
+        </div>
+        <table class="w-full table-auto border-collapse">
+          <thead>
+            <tr class="bg-gray-700">
+              <th class="p-2 text-left">Dato</th>
+              <th class="p-2 text-left">Beskrivelse</th>
+              <th class="p-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="h in holidays"
+              :key="h.id"
+              class="border-b border-gray-600"
+            >
+              <td class="p-2">{{ formatDate(h.date) }}</td>
+              <td class="p-2">{{ h.description }}</td>
+              <td class="p-2 text-right">
+                <button
+                  @click="deleteHoliday(h.id)"
+                  class="text-red-500 hover:underline"
+                >
+                  Slet
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Ferieperioder -->
+      <section class="bg-gray-800 p-6 rounded-lg shadow">
+        <h2 class="text-xl font-semibold mb-4">🌞 Ferieperioder</h2>
+        <div class="flex gap-3 mb-4">
+          <input
+            v-model="newVacation.start_date"
+            type="date"
+            class="p-2 rounded bg-gray-700 border border-gray-600 text-white"
+          />
+          <input
+            v-model="newVacation.end_date"
+            type="date"
+            class="p-2 rounded bg-gray-700 border border-gray-600 text-white"
+          />
+          <select
+            v-model="newVacation.station_id"
+            class="p-2 rounded bg-gray-700 border border-gray-600 text-white"
+          >
+            <option disabled value="">Vælg station</option>
+            <option v-for="s in stations" :key="s.id" :value="s.id">
+              {{ s.name }}
+            </option>
+          </select>
+          <button
+            @click="addVacation"
+            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
+          >
+            Tilføj
+          </button>
+        </div>
+        <table class="w-full table-auto border-collapse">
+          <thead>
+            <tr class="bg-gray-700">
+              <th class="p-2 text-left">Startdato</th>
+              <th class="p-2 text-left">Slutdato</th>
+              <th class="p-2 text-left">Stationer</th>
+              <th class="p-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="v in vacations"
+              :key="v.id"
+              class="border-b border-gray-600"
+            >
+              <td class="p-2">{{ formatDate(v.start_date) }}</td>
+              <td class="p-2">{{ formatDate(v.end_date) }}</td>
+              <td class="p-2">{{ v.station_name }}</td>
+              <td class="p-2 text-right">
+                <button
+                  @click="deleteVacation(v.id)"
+                  class="text-red-500 hover:underline"
+                >
+                  Slet
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+
+    <script>
+      const app = Vue.createApp({
+        data() {
+          return {
+            holidays: [],
+            vacations: [],
+            stations: [],
+            newHoliday: { date: "", description: "" },
+            newVacation: {
+              start_date: "",
+              end_date: "",
+              station_id: "",
+            },
+          };
+        },
+        computed: {
+          currentHolidays() {
+            const today = new Date().toISOString().slice(0, 10);
+            return this.holidays.filter((h) => h.date >= today);
+          },
+          currentVacations() {
+            const today = new Date().toISOString().slice(0, 10);
+            return this.vacations.filter(
+              (v) => v.start_date <= today && v.end_date >= today
+            );
+          },
+        },
+        mounted() {
+          this.loadData();
+          this.loadStations();
+        },
+        methods: {
+          async loadData() {
+            try {
+              const [hol, vac] = await Promise.all([
+                axios.get("api.php?endpoint=getHolidays"),
+                axios.get("api.php?endpoint=getVacations"),
+              ]);
+              this.holidays = hol.data;
+              this.vacations = vac.data;
+            } catch (err) {
+              console.error("Fejl ved hent af data:", err);
+            }
+          },
+          async loadStations() {
+            try {
+              const res = await axios.get("api.php?endpoint=getStations");
+              this.stations = res.data;
+            } catch (err) {
+              console.error("Fejl ved hent af stationer:", err);
+            }
+          },
+
+          formatDate(dateStr) {
+            if (!dateStr) return "";
+            const d = new Date(dateStr);
+            const day = String(d.getDate()).padStart(2, "0");
+            const month = String(d.getMonth() + 1).padStart(2, "0"); // måneder er 0-baserede
+            const year = d.getFullYear();
+            return `${day}.${month}.${year}`;
+          },
+
+          // Tilføj helligdag
+          async addHoliday() {
+            if (!this.newHoliday.date || !this.newHoliday.description) return;
+            try {
+              await axios.post("api.php?endpoint=addHoliday", this.newHoliday);
+              this.newHoliday = { date: "", description: "" };
+              this.loadData();
+            } catch (err) {
+              console.error("Fejl ved tilføjelse af helligdag:", err);
+            }
+          },
+
+          // Slet helligdag
+          async deleteHoliday(id) {
+            if (!confirm("Er du sikker på, at du vil slette denne helligdag?"))
+              return;
+            try {
+              await axios.delete("api.php?endpoint=deleteHoliday", {
+                data: { id },
+              });
+              this.loadData();
+            } catch (err) {
+              console.error("Fejl ved sletning af helligdag:", err);
+            }
+          },
+
+          // Tilføj ferie
+          async addVacation() {
+            if (
+              !this.newVacation.start_date ||
+              !this.newVacation.end_date ||
+              !this.newVacation.station_id
+            )
+              return;
+
+            const payload = {
+              start_date: this.newVacation.start_date,
+              end_date: this.newVacation.end_date,
+              station_id: this.newVacation.station_id,
+            };
+
+            try {
+              await axios.post("api.php?endpoint=addVacation", payload);
+              this.newVacation = {
+                start_date: "",
+                end_date: "",
+                station_id: "",
+              };
+              this.loadData();
+            } catch (err) {
+              console.error("Fejl ved tilføjelse af ferie:", err);
+            }
+          },
+
+          // Slet ferie
+          async deleteVacation(id) {
+            if (
+              !confirm("Er du sikker på, at du vil slette denne ferieperiode?")
+            )
+              return;
+            try {
+              await axios.delete("api.php?endpoint=deleteVacation", {
+                data: { id },
+              });
+              this.loadData();
+            } catch (err) {
+              console.error("Fejl ved sletning af ferie:", err);
+            }
+          },
+        },
+      });
+      app.mount("#app");
+    </script>
+  </body>
+</html>
