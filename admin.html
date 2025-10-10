@@ -5,38 +5,43 @@
     <title>Admin – Vagtplan</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link href="https://fonts.cdnfonts.com/css/flama" rel="stylesheet" />
     <link rel="stylesheet" href="dist/output.css" />
   </head>
-  <body class="bg-gray-900 text-white font-sans p-6">
+  <body class="bg-grey text-white font-flama p-6">
+    <!-- Logo -->
+    <div class="flex justify-center pb-8">
+      <img
+        src="images/logo.webp"
+        alt="Hovedstadens Beredskabs logo"
+        class="max-w-[15em]"
+      />
+    </div>
     <div id="app" class="max-w-5xl mx-auto space-y-8">
-      <h1 class="text-2xl font-bold text-center mb-6">
-        🛠️ Adminpanel – Vagtplan
-      </h1>
-
       <!-- Helligdage -->
-      <section class="bg-gray-800 p-6 rounded-lg shadow">
-        <h2 class="text-xl font-semibold mb-4">📅 Helligdage</h2>
+      <section class="bg-darkerblue p-6 rounded-lg shadow">
+        <h2 class="text-2xl mb-3">Helligdage</h2>
         <div class="flex gap-3 mb-4">
           <input
             v-model="newHoliday.date"
             type="date"
-            class="p-2 rounded bg-gray-700 border border-gray-600 text-white"
+            class="px-3 py-2 rounded-md border-none text-black"
           />
           <input
             v-model="newHoliday.description"
             placeholder="Beskrivelse"
-            class="p-2 rounded bg-gray-700 border border-gray-600 text-white flex-1"
+            class="px-3 py-2 rounded-md border-none text-black bg-grey flex-1"
           />
           <button
             @click="addHoliday"
-            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
+            class="px-4 py-2 bg-orange rounded-md text-white cursor-pointer hover:bg-yellow-500"
           >
             Tilføj
           </button>
         </div>
         <table class="w-full table-auto border-collapse">
           <thead>
-            <tr class="bg-gray-700">
+            <tr class="bg-darkblue">
               <th class="p-2 text-left">Dato</th>
               <th class="p-2 text-left">Beskrivelse</th>
               <th class="p-2"></th>
@@ -64,22 +69,22 @@
       </section>
 
       <!-- Ferieperioder -->
-      <section class="bg-gray-800 p-6 rounded-lg shadow">
-        <h2 class="text-xl font-semibold mb-4">🌞 Ferieperioder</h2>
+      <section class="bg-darkerblue p-6 rounded-lg shadow font-flama">
+        <h2 class="text-2xl mb-3">Ferieperioder</h2>
         <div class="flex gap-3 mb-4">
           <input
             v-model="newVacation.start_date"
             type="date"
-            class="p-2 rounded bg-gray-700 border border-gray-600 text-white"
+            class="px-3 py-2 rounded-md border-none text-black"
           />
           <input
             v-model="newVacation.end_date"
             type="date"
-            class="p-2 rounded bg-gray-700 border border-gray-600 text-white"
+            class="px-3 py-2 rounded-md border-none text-black"
           />
           <select
             v-model="newVacation.station_id"
-            class="p-2 rounded bg-gray-700 border border-gray-600 text-white"
+            class="px-3 py-2 rounded-md border-none text-black flex-1"
           >
             <option disabled value="">Vælg station</option>
             <option v-for="s in stations" :key="s.id" :value="s.id">
@@ -88,14 +93,14 @@
           </select>
           <button
             @click="addVacation"
-            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded"
+            class="px-4 py-2 bg-orange rounded-md text-white cursor-pointer font-flama hover:bg-yellow-500"
           >
             Tilføj
           </button>
         </div>
         <table class="w-full table-auto border-collapse">
           <thead>
-            <tr class="bg-gray-700">
+            <tr class="bg-darkblue">
               <th class="p-2 text-left">Startdato</th>
               <th class="p-2 text-left">Slutdato</th>
               <th class="p-2 text-left">Stationer</th>

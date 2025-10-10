@@ -5,9 +5,10 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        darkblue: "#1E3A8A",
-        darkerblue: "#1B365D",
-        orange: "#F97316",
+        grey: "f#2f2f2;",
+        darkblue: "#292d4e",
+        darkerblue: "#171c40",
+        orange: "#e09e40",
       },
       fontFamily: {
         flama: "'Flama', sans-serif",
