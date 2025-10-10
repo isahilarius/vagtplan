@@ -5,103 +5,67 @@
     <title>Vagtskema Dashboard</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link href="https://fonts.cdnfonts.com/css/flama" rel="stylesheet" />
-
-    <style>
-      body {
-        font-family: "Flama", sans-serif;
-        background: #f2f2f2;
-        padding: 24px;
-        color: white;
-      }
-      .logo {
-        display: flex;
-        justify-content: center;
-        padding-bottom: 30px;
-      }
-      .logo img {
-        max-width: 15em;
-      }
-      .card {
-        background: #171c40;
-        padding: 18px;
-        border-radius: 10px;
-        max-width: 900px;
-        margin: auto;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-      }
-      h1 {
-        margin: 0 0 12px 0;
-        font-size: 20px;
-      }
-      .controls {
-        display: flex;
-        gap: 12px;
-        margin-bottom: 12px;
-      }
-      input[type="date"] {
-        padding: 8px;
-        border-radius: 6px;
-        border: none;
-        font-family: "Flama", sans-serif;
-      }
-      button {
-        padding: 8px 14px;
-        background: #e09e40;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-family: "Flama", sans-serif;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-      }
-      th,
-      td {
-        padding: 10px;
-        text-align: left;
-        border-bottom: 1px solid #eee;
-      }
-      th {
-        background: #292d4e;
-      }
-      .note {
-        color: white;
-        font-size: 13px;
-      }
-    </style>
+    <link rel="stylesheet" href="/app.css" />
   </head>
-  <body>
-    <div class="logo">
-      <img src="images/logo.webp" alt="Hovedstadens Beredskabs logo" />
+  <body class="font-flama bg-gray-200 text-white p-6">
+    <!-- Logo -->
+    <div class="flex justify-center pb-8">
+      <img
+        src="images/logo.webp"
+        alt="Hovedstadens Beredskabs logo"
+        class="max-w-[15em]"
+      />
     </div>
-    <div id="app" class="card">
-      <h1>Vagtskema - Oversigt</h1>
+    <h1 class="text-4xl text-red-500 font-flama">Test Tailwind</h1>
 
-      <div class="controls">
-        <input type="date" v-model="date" />
-        <button @click="refresh">Se vagtskema</button>
+    <!-- Card -->
+    <div
+      id="app"
+      class="bg-darkblue p-5 rounded-xl max-w-3xl mx-auto shadow-md"
+    >
+      <h1 class="text-2xl mb-3 font-flama">Vagtskema - Oversigt</h1>
+
+      <!-- Controls -->
+      <div class="flex gap-3 mb-3">
+        <input
+          type="date"
+          v-model="date"
+          class="px-3 py-2 rounded-md border-none text-black font-flama"
+        />
+        <button
+          @click="refresh"
+          class="px-4 py-2 bg-orange rounded-md text-white cursor-pointer font-flama hover:bg-yellow-500"
+        >
+          Se vagtskema
+        </button>
       </div>
 
-      <div v-if="loading">Henter...</div>
-      <div v-if="error" style="color: darkred">{{ error }}</div>
-
-      <table v-if="stations.length && !loading">
+      <!-- Table -->
+      <table
+        v-if="stations.length && !loading"
+        class="w-full border-collapse mt-2 text-white"
+      >
         <thead>
-          <tr>
-            <th>Station</th>
-            <th>Aktiv gruppe (kl. 8.00)</th>
-            <th>Note</th>
+          <tr class="bg-darkerblue">
+            <th class="px-3 py-2 text-left">Station</th>
+            <th class="px-3 py-2 text-left">Aktiv gruppe (kl. 8.00)</th>
+            <th class="px-3 py-2 text-left">Note</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="s in stations" :key="s.id">
-            <td>{{ s.name }}</td>
-            <td v-if="groups[s.id]">{{ groups[s.id].group }}</td>
-            <td v-else>—</td>
-            <td v-if="groups[s.id]">{{ groups[s.id].reason }}</td>
+          <tr
+            v-for="s in stations"
+            :key="s.id"
+            class="border-b border-gray-500"
+          >
+            <td class="px-3 py-2">{{ s.name }}</td>
+            <td class="px-3 py-2" v-if="groups[s.id]">
+              {{ groups[s.id].group }}
+            </td>
+            <td class="px-3 py-2" v-else>—</td>
+            <td class="px-3 py-2" v-if="groups[s.id]">
+              {{ groups[s.id].reason }}
+            </td>
           </tr>
         </tbody>
       </table>
