@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <title>Admin – Vagtplan</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link href="https://fonts.cdnfonts.com/css/flama" rel="stylesheet" />
     <link rel="stylesheet" href="dist/output.css" />
   </head>
+
   <body class="bg-grey text-white font-flama p-6">
     <!-- Logo -->
     <div class="flex justify-center pb-8">
@@ -17,10 +17,13 @@
         class="max-w-[15em]"
       />
     </div>
+
+    <!-- Helligdage-->
     <div id="app" class="max-w-5xl mx-auto space-y-8">
-      <!-- Helligdage -->
       <section class="bg-darkerblue p-6 rounded-lg shadow">
         <h2 class="text-2xl mb-3">Helligdage</h2>
+
+        <!-- Controls -->
         <div class="flex gap-3 mb-4">
           <input
             v-model="newHoliday.date"
@@ -39,6 +42,8 @@
             Tilføj
           </button>
         </div>
+
+        <!-- Table -->
         <table class="w-full table-auto border-collapse">
           <thead>
             <tr class="bg-darkblue">
@@ -71,6 +76,8 @@
       <!-- Ferieperioder -->
       <section class="bg-darkerblue p-6 rounded-lg shadow font-flama">
         <h2 class="text-2xl mb-3">Ferieperioder</h2>
+
+        <!-- Controls -->
         <div class="flex gap-3 mb-4">
           <input
             v-model="newVacation.start_date"
@@ -98,6 +105,8 @@
             Tilføj
           </button>
         </div>
+
+        <!-- Table -->
         <table class="w-full table-auto border-collapse">
           <thead>
             <tr class="bg-darkblue">
@@ -130,140 +139,7 @@
       </section>
     </div>
 
-    <script>
-      const app = Vue.createApp({
-        data() {
-          return {
-            holidays: [],
-            vacations: [],
-            stations: [],
-            newHoliday: { date: "", description: "" },
-            newVacation: {
-              start_date: "",
-              end_date: "",
-              station_id: "",
-            },
-          };
-        },
-        computed: {
-          currentHolidays() {
-            const today = new Date().toISOString().slice(0, 10);
-            return this.holidays.filter((h) => h.date >= today);
-          },
-          currentVacations() {
-            const today = new Date().toISOString().slice(0, 10);
-            return this.vacations.filter(
-              (v) => v.start_date <= today && v.end_date >= today
-            );
-          },
-        },
-        mounted() {
-          this.loadData();
-          this.loadStations();
-        },
-        methods: {
-          async loadData() {
-            try {
-              const [hol, vac] = await Promise.all([
-                axios.get("api.php?endpoint=getHolidays"),
-                axios.get("api.php?endpoint=getVacations"),
-              ]);
-              this.holidays = hol.data;
-              this.vacations = vac.data;
-            } catch (err) {
-              console.error("Fejl ved hent af data:", err);
-            }
-          },
-          async loadStations() {
-            try {
-              const res = await axios.get("api.php?endpoint=getStations");
-              this.stations = res.data;
-            } catch (err) {
-              console.error("Fejl ved hent af stationer:", err);
-            }
-          },
-
-          formatDate(dateStr) {
-            if (!dateStr) return "";
-            const d = new Date(dateStr);
-            const day = String(d.getDate()).padStart(2, "0");
-            const month = String(d.getMonth() + 1).padStart(2, "0"); // måneder er 0-baserede
-            const year = d.getFullYear();
-            return `${day}.${month}.${year}`;
-          },
-
-          // Tilføj helligdag
-          async addHoliday() {
-            if (!this.newHoliday.date || !this.newHoliday.description) return;
-            try {
-              await axios.post("api.php?endpoint=addHoliday", this.newHoliday);
-              this.newHoliday = { date: "", description: "" };
-              this.loadData();
-            } catch (err) {
-              console.error("Fejl ved tilføjelse af helligdag:", err);
-            }
-          },
-
-          // Slet helligdag
-          async deleteHoliday(id) {
-            if (!confirm("Er du sikker på, at du vil slette denne helligdag?"))
-              return;
-            try {
-              await axios.delete("api.php?endpoint=deleteHoliday", {
-                data: { id },
-              });
-              this.loadData();
-            } catch (err) {
-              console.error("Fejl ved sletning af helligdag:", err);
-            }
-          },
-
-          // Tilføj ferie
-          async addVacation() {
-            if (
-              !this.newVacation.start_date ||
-              !this.newVacation.end_date ||
-              !this.newVacation.station_id
-            )
-              return;
-
-            const payload = {
-              start_date: this.newVacation.start_date,
-              end_date: this.newVacation.end_date,
-              station_id: this.newVacation.station_id,
-            };
-
-            try {
-              await axios.post("api.php?endpoint=addVacation", payload);
-              this.newVacation = {
-                start_date: "",
-                end_date: "",
-                station_id: "",
-              };
-              this.loadData();
-            } catch (err) {
-              console.error("Fejl ved tilføjelse af ferie:", err);
-            }
-          },
-
-          // Slet ferie
-          async deleteVacation(id) {
-            if (
-              !confirm("Er du sikker på, at du vil slette denne ferieperiode?")
-            )
-              return;
-            try {
-              await axios.delete("api.php?endpoint=deleteVacation", {
-                data: { id },
-              });
-              this.loadData();
-            } catch (err) {
-              console.error("Fejl ved sletning af ferie:", err);
-            }
-          },
-        },
-      });
-      app.mount("#app");
-    </script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>

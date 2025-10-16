@@ -3,10 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <title>Vagtplan</title>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link href="https://fonts.cdnfonts.com/css/flama" rel="stylesheet" />
     <link rel="stylesheet" href="dist/output.css" />
   </head>
+
   <body class="font-flama bg-grey text-white p-6">
     <!-- Logo -->
     <div class="flex justify-center pb-8">
@@ -22,7 +23,7 @@
       id="app"
       class="bg-darkerblue p-5 rounded-xl max-w-3xl mx-auto shadow-md"
     >
-      <h1 class="text-2xl mb-3 font-flama">Vagtskema - Oversigt</h1>
+      <h1 class="text-2xl mb-3 font-flama">Vagtskema</h1>
 
       <!-- Controls -->
       <div class="flex gap-3 mb-3">
@@ -70,69 +71,7 @@
       </table>
     </div>
 
-    <script>
-      const { createApp } = Vue;
-      createApp({
-        data() {
-          return {
-            apiUrl: "http://localhost:8000/api.php",
-            date: new Date().toISOString().slice(0, 10),
-            stations: [],
-            groups: {},
-            loading: false,
-            error: "",
-          };
-        },
-        mounted() {
-          this.loadStations();
-        },
-        methods: {
-          async loadStations() {
-            try {
-              const res = await fetch(`${this.apiUrl}?endpoint=stations`);
-              const data = await res.json();
-
-              if (!Array.isArray(data)) {
-                throw new Error("Stations fetch returnerede ikke et array");
-              }
-
-              this.stations = data;
-              this.refresh();
-            } catch (e) {
-              this.error =
-                "Kunne ikke hente stations. Start php-serveren (php -S localhost:8000) eller tjek API: " +
-                e;
-            }
-          },
-          async refresh() {
-            this.loading = true;
-            this.groups = {};
-            this.error = "";
-            try {
-              // hent gruppe for hver station parallelt
-              const promises = this.stations.map((s) =>
-                fetch(
-                  `${this.apiUrl}?endpoint=group&stationId=${s.id}&date=${this.date}`
-                )
-                  .then((r) =>
-                    r.ok
-                      ? r.json()
-                      : r.text().then((t) => {
-                          throw t;
-                        })
-                  )
-                  .then((data) => ({ id: s.id, data }))
-              );
-              const results = await Promise.all(promises);
-              results.forEach((r) => (this.groups[r.id] = r.data));
-            } catch (err) {
-              this.error = "Fejl ved hent af grupper: " + err;
-            } finally {
-              this.loading = false;
-            }
-          },
-        },
-      }).mount("#app");
-    </script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>
