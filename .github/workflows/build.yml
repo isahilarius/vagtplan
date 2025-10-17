@@ -15,24 +15,38 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      # 2. Sæt op Docker Buildx
+      # 2. Installer Node.js for ESLint
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "17.4.0"
+
+      # 3. Lint JS
+      - name: Lint JS
+        run: |
+          npm install eslint --save-dev
+          npx eslint app.js --max-warnings=0
+
+      # 4. Sæt op Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # 3. Byg Docker image
+      # 5. Byg Docker image
       - name: Build Docker image
         run: docker build -t vagtplan:ci .
 
-      # 4. Kør container midlertidigt på port 8000
+      # 6. Kør container midlertidigt på port 8000
       - name: Run container
         run: docker run -d --name vagtplan_test -p 8000:80 vagtplan:ci
 
-      # 5. Test API
+      # 7. Test API
       - name: Test API
         run: |
           sleep 5 # vent på at containeren starter
           curl -f http://localhost:8000/api.php?endpoint=getStations
+          curl -f http://localhost:8000/api.php?endpoint=getHolidays
+          curl -f "http://localhost:8000/api.php?endpoint=group&stationId=1&date=2025-10-17"
 
-      # 6. Stop og fjern container
+      # 8. Stop og fjern container
       - name: Stop container
         run: docker stop vagtplan_test && docker rm vagtplan_test
