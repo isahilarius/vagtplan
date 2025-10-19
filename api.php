@@ -45,8 +45,8 @@ if ($endpoint === 'group') {
     // Hent data fra stationen
     $stationName = $station['name'];
     $rotationAll = explode('_', $station['rotation']); 
-    $mandagRot = str_split($rotationAll[0] ?? 'AB'); 
-    $fredagRot = str_split($rotationAll[1] ?? 'ABCD'); 
+    $mondayRot = str_split($rotationAll[0] ?? 'AB'); 
+    $fridayRot = str_split($rotationAll[1] ?? 'ABCD'); 
     $holidayDelay = intval($station['holiday_delay']) === 1; 
 
     // Kontroller om stationen har ferie
@@ -80,19 +80,19 @@ if ($endpoint === 'group') {
 
     // Beregn hvilken gruppe der skal kaldes
     if ($isHoliday && $wday === 'Monday' && $holidayDelay) {
-        $group = $fredagRot[($weeksPassed - 1) % count($fredagRot)];
+        $group = $fridayRot[($weeksPassed - 1) % count($fridayRot)];
         $reason = "Helligdag – samme hold (skift i morgen)";
     } elseif ($wday === 'Monday') {
-        $group = $mandagRot[$weeksPassed % count($mandagRot)];
+        $group = $mondayRot[$weeksPassed % count($mondayRot)];
         $reason = "Mandagsskift";
     } elseif ($wday === 'Friday') {
-        $group = $fredagRot[$weeksPassed % count($fredagRot)];
+        $group = $fridayRot[$weeksPassed % count($fridayRot)];
         $reason = "Fredagsskift";
     } elseif (in_array($wday, ['Saturday', 'Sunday'])) {
-        $group = $fredagRot[$weeksPassed % count($fredagRot)];
+        $group = $fridayRot[$weeksPassed % count($fridayRot)];
         $reason = "Weekend – samme hold";
     } else {
-        $group = $mandagRot[$weeksPassed % count($mandagRot)];
+        $group = $mondayRot[$weeksPassed % count($mondayRot)];
         $reason = "Hverdag – samme hold";
     }
 
