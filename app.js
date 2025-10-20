@@ -21,17 +21,14 @@ createApp({
   computed: {
     // Returnerer alle helligdage
     currentHolidays() {
-      const today = new Date().toISOString().slice(0, 10);
-      return this.holidays.filter((h) => h.date >= today);
+      return this.holidays;
     },
     // Returnerer alle ferieperioder
     currentVacations() {
-      const today = new Date().toISOString().slice(0, 10);
-      return this.vacations.filter(
-        (v) => v.start_date <= today && v.end_date >= today
-      );
+      return this.vacations;
     },
   },
+
   mounted() {
     // Hent data når appen startes
     this.loadStations();
